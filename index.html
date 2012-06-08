@@ -1,0 +1,77 @@
+<html><head><meta charset="utf-8" /><script src="jquery-1.7.2.min.js"></script><script src="jquery.getimagedata.min.js"></script><style type="text/css">body {font-family: monospace; text-align:center;}</style></head><body><div id="loading" style="display:none">Please Wait...</div><form id="f" style="display:none"><input type="text" placeholder="Image URL" name="i" /><button>Do it.</button></form><pre id="t" style="display:none"></pre><script>var __slice = Array.prototype.slice;var __hasProp = Object.prototype.hasOwnProperty;var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };var __extends = function(child, parent) {  for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }  function ctor() { this.constructor = child; }  ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;  return child; };var __indexOf = Array.prototype.indexOf || function(item) {  for (var i = 0, l = this.length; i < l; i++) {    if (this[i] === item) return i;  } return -1; };(function () {
+      /*
+      */
+
+      /*
+      */
+
+      var getParameterByName, getPixel, imgUrl, sampleText, width;
+      getParameterByName = function(name) {
+        var regex, regexS, results;
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        regexS = "[\\?&]" + name + "=([^&#]*)";
+        regex = new RegExp(regexS);
+        results = regex.exec(window.location.search);
+        if (results == null) {
+          return "";
+        } else {
+          return decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+      };
+      getPixel = function(imageData, x, y, w, h) {
+        var a, b, g, index, r;
+        index = (x + y * imageData.width) * 4;
+        r = imageData.data[index];
+        g = imageData.data[index + 1];
+        b = imageData.data[index + 2];
+        a = imageData.data[index + 3];
+        return "rgb(" + r + "," + g + "," + b + ")";
+      };
+      sampleText = 'Select All. ';
+      imgUrl = getParameterByName('i');
+      if (imgUrl === '') {
+        return $('#f').attr('style', 'display:block');
+      } else {
+        $('#loading').show();
+        width = 150;
+        return $.getImageData({
+          url: imgUrl,
+          success: function(img) {
+            var canvas, css, ctx, h, i, map, t, text, w, x, y;
+            canvas = document.createElement('canvas');
+            w = Math.round(width);
+            h = Math.round((width / img.width) * img.height) / 2;
+            canvas.setAttribute('width', w);
+            canvas.setAttribute('height', h);
+            ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            map = ctx.getImageData(0, 0, w, h);
+            text = '';
+            css = '';
+            x = 0;
+            y = 0;
+            i = 0;
+            while (y < h) {
+              while (x < w) {
+                css += ".p" + x + "_" + y + "::selection{background:" + (getPixel(map, x, y, w, h)) + ";}";
+                text += "<span class='p" + x + "_" + y + "'>" + sampleText[i % sampleText.length] + "</span>";
+                ++x;
+                ++i;
+              }
+              text += '\n';
+              x = 0;
+              ++y;
+            }
+            $('html > head').append($('<style>' + css + '</style>'));
+            t = $('#t');
+            t.attr('style', 'display:block');
+            t.html(text);
+            return $('#loading').hide();
+          },
+          error: function(e) {
+            console.log(e);
+            return alert('Aw shucks, we couldn\'t load that.');
+          }
+        });
+      }
+    }).call(this);</script></body></html>
