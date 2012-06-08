@@ -2,7 +2,7 @@ html ->
   head ->
     meta charset:'utf-8'
     script src:'jquery-1.7.2.min.js'
-    script src:'jquery.getimagedata.min.js'
+    script src:'jquery.jsonp-2.3.1.min.js'
     style type:'text/css', 'body {font-family: monospace; text-align:center;}'
 
   body ->
@@ -55,43 +55,53 @@ html ->
       else
         $('#loading').show()
         width = 120
+        #imgUrl = encodeURIComponent(imgUrl)
         # Get image:
-        $.getImageData
-          url:imgUrl
-          success: (img) ->
-            canvas = document.createElement 'canvas'
-            w = Math.round(width)
-            h = Math.round((width/img.width) * img.height)/2
-            canvas.setAttribute 'width', w
-            canvas.setAttribute 'height', h
-            ctx = canvas.getContext '2d'
-            ctx.drawImage img, 0,0, w,h
-            map = ctx.getImageData 0,0, w,h
-            
-            text = ''
-            css = ''
-            x=0
-            y=0
-            i=0
-            while y < h
-              while x < w
-                css += ".p#{x}_#{y}::selection{background:#{getPixel(map,x,y,w,h)};} .p#{x}_#{y}::-moz-selection{background:#{getPixel(map,x,y,w,h)};}"
-                text += "<span class='p#{x}_#{y}'>#{sampleText[i%sampleText.length]}</span>"
-                ++x
-                ++i
-              text += '\n'
-              x = 0
-              ++y
+        $.jsonp
+          url: 'http://lmn2.us.to:3330/?callback=?'
+          data:
+            url: imgUrl
+          success: (d) ->
+            console.log d
+            img = new Image d.width, d.height
+            img.onload = ->
+              canvas = document.createElement 'canvas'
+              w = Math.round(width)
+              h = Math.round((width/img.width) * img.height)/2
+              canvas.setAttribute 'width', w
+              canvas.setAttribute 'height', h
+              ctx = canvas.getContext '2d'
+              ctx.drawImage img, 0,0, w,h
+              map = ctx.getImageData 0,0, w,h
+              
+              text = ''
+              css = ''
+              x=0
+              y=0
+              i=0
+              while y < h
+                while x < w
+                  css += ".p#{x}_#{y}::selection{background:#{getPixel(map,x,y,w,h)};} .p#{x}_#{y}::-moz-selection{background:#{getPixel(map,x,y,w,h)};}"
+                  text += "<span class='p#{x}_#{y}'>#{sampleText[i%sampleText.length]}</span>"
+                  ++x
+                  ++i
+                text += '\n'
+                x = 0
+                ++y
 
-            $('html > head').append($('<style>'+css+'</style>'))
+              $('html > head').append($('<style>'+css+'</style>'))
 
-            t=$ '#t'
-            t.attr('style','display:block')
-            t.html(text)
-            $('#loading').hide()
-            $('#link').show()
-
-          error: (e) ->
+              t=$ '#t'
+              t.attr('style','display:block')
+              t.html(text)
+              $('#loading').hide()
+              $('#link').show()
+              return true
+            img.onerror = (e) ->
+              console.log e
+              throw e
+            img.src = d.data
+          error: ->
             $('#link').hide()
             $('#loading').hide()
             $('#t').hide()
