@@ -6,6 +6,7 @@ html ->
     style type:'text/css', 'body {font-family: monospace; text-align:center;}'
 
   body ->
+    div id:'msg', style:'display:none;color:red;font-weight:bold'
     div id:'loading', style:'display:none', 'Please Wait...'
 
     form id:'f', style:'display:none', ->
@@ -15,6 +16,9 @@ html ->
     pre id:'t', style:'display:none', ->
       """
       """
+
+    div id:'link', style:'display:none', ->
+      a href:'/', 'lol wat'
 
     coffeescript ->
       ###           ###
@@ -50,7 +54,7 @@ html ->
         $('#f').attr('style','display:block')
       else
         $('#loading').show()
-        width = 150
+        width = 120
         # Get image:
         $.getImageData
           url:imgUrl
@@ -85,7 +89,11 @@ html ->
             t.attr('style','display:block')
             t.html(text)
             $('#loading').hide()
+            $('#link').show()
 
           error: (e) ->
-            console.log e
-            alert 'Aw shucks, we couldn\'t load that.'
+            $('#link').hide()
+            $('#loading').hide()
+            $('#t').hide()
+            $('#f').show()
+            $('#msg').html('Hmm. Something went wrong. Try again/try something else.').show()
