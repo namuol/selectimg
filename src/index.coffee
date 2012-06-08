@@ -18,7 +18,7 @@ html ->
       """
 
     div id:'link', style:'display:none', ->
-      a href:'/', 'lol wat'
+      a href:'.', 'lol wat'
 
     coffeescript ->
       ###           ###
