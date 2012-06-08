@@ -75,7 +75,7 @@ html ->
             i=0
             while y < h
               while x < w
-                css += ".p#{x}_#{y}::selection{background:#{getPixel(map,x,y,w,h)};}"
+                css += ".p#{x}_#{y}::selection{background:#{getPixel(map,x,y,w,h)};} .p#{x}_#{y}::-moz-selection{background:#{getPixel(map,x,y,w,h)};}"
                 text += "<span class='p#{x}_#{y}'>#{sampleText[i%sampleText.length]}</span>"
                 ++x
                 ++i
