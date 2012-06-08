@@ -61,6 +61,7 @@ html ->
           url: 'http://lmn2.us.to:3330/?callback=?'
           data:
             url: imgUrl
+          cache: true
           success: (d) ->
             console.log d
             img = new Image d.width, d.height
