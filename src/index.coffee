@@ -6,6 +6,9 @@ html ->
     style type:'text/css', 'body {font-family: monospace; text-align:center;}'
 
   body ->
+    div id:'back', style:'position:fixed;top:0;left:0;background:white', ->
+      a style:'text-decoration:none', href:'http://namuol.github.com/', 'namuol.github.com ↗'
+
     div id:'msg', style:'display:none;color:red;font-weight:bold'
     div id:'loading', style:'display:none', 'Please Wait...'
 
