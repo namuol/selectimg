@@ -1,4 +1,4 @@
-<html><head><meta charset="utf-8" /><script src="jquery-1.7.2.min.js"></script><script src="jquery.getimagedata.min.js"></script><style type="text/css">body {font-family: monospace; text-align:center;}</style></head><body><div id="msg" style="display:none;color:red;font-weight:bold"></div><div id="loading" style="display:none">Please Wait...</div><form id="f" style="display:none"><input type="text" placeholder="Image URL" name="i" /><button>Do it.</button></form><pre id="t" style="display:none"></pre><div id="link" style="display:none"><a href=".">lol wat</a></div><script>var __slice = Array.prototype.slice;var __hasProp = Object.prototype.hasOwnProperty;var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };var __extends = function(child, parent) {  for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }  function ctor() { this.constructor = child; }  ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;  return child; };var __indexOf = Array.prototype.indexOf || function(item) {  for (var i = 0, l = this.length; i < l; i++) {    if (this[i] === item) return i;  } return -1; };(function () {
+<html><head><meta charset="utf-8" /><script src="jquery-1.7.2.min.js"></script><script src="jquery.jsonp-2.3.1.min.js"></script><style type="text/css">body {font-family: monospace; text-align:center;}</style></head><body><div id="msg" style="display:none;color:red;font-weight:bold"></div><div id="loading" style="display:none">Please Wait...</div><form id="f" style="display:none"><input type="text" placeholder="Image URL" name="i" /><button>Do it.</button></form><pre id="t" style="display:none"></pre><div id="link" style="display:none"><a href=".">lol wat</a></div><script>var __slice = Array.prototype.slice;var __hasProp = Object.prototype.hasOwnProperty;var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };var __extends = function(child, parent) {  for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }  function ctor() { this.constructor = child; }  ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;  return child; };var __indexOf = Array.prototype.indexOf || function(item) {  for (var i = 0, l = this.length; i < l; i++) {    if (this[i] === item) return i;  } return -1; };(function () {
       /*
       */
 
@@ -34,42 +34,56 @@
       } else {
         $('#loading').show();
         width = 120;
-        return $.getImageData({
-          url: imgUrl,
-          success: function(img) {
-            var canvas, css, ctx, h, i, map, t, text, w, x, y;
-            canvas = document.createElement('canvas');
-            w = Math.round(width);
-            h = Math.round((width / img.width) * img.height) / 2;
-            canvas.setAttribute('width', w);
-            canvas.setAttribute('height', h);
-            ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            map = ctx.getImageData(0, 0, w, h);
-            text = '';
-            css = '';
-            x = 0;
-            y = 0;
-            i = 0;
-            while (y < h) {
-              while (x < w) {
-                css += ".p" + x + "_" + y + "::selection{background:" + (getPixel(map, x, y, w, h)) + ";} .p" + x + "_" + y + "::-moz-selection{background:" + (getPixel(map, x, y, w, h)) + ";}";
-                text += "<span class='p" + x + "_" + y + "'>" + sampleText[i % sampleText.length] + "</span>";
-                ++x;
-                ++i;
-              }
-              text += '\n';
-              x = 0;
-              ++y;
-            }
-            $('html > head').append($('<style>' + css + '</style>'));
-            t = $('#t');
-            t.attr('style', 'display:block');
-            t.html(text);
-            $('#loading').hide();
-            return $('#link').show();
+        return $.jsonp({
+          url: 'http://lmn2.us.to:3330/?callback=?',
+          data: {
+            url: imgUrl
           },
-          error: function(e) {
+          success: function(d) {
+            var img;
+            console.log(d);
+            img = new Image(d.width, d.height);
+            img.onload = function() {
+              var canvas, css, ctx, h, i, map, t, text, w, x, y;
+              canvas = document.createElement('canvas');
+              w = Math.round(width);
+              h = Math.round((width / img.width) * img.height) / 2;
+              canvas.setAttribute('width', w);
+              canvas.setAttribute('height', h);
+              ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              map = ctx.getImageData(0, 0, w, h);
+              text = '';
+              css = '';
+              x = 0;
+              y = 0;
+              i = 0;
+              while (y < h) {
+                while (x < w) {
+                  css += ".p" + x + "_" + y + "::selection{background:" + (getPixel(map, x, y, w, h)) + ";} .p" + x + "_" + y + "::-moz-selection{background:" + (getPixel(map, x, y, w, h)) + ";}";
+                  text += "<span class='p" + x + "_" + y + "'>" + sampleText[i % sampleText.length] + "</span>";
+                  ++x;
+                  ++i;
+                }
+                text += '\n';
+                x = 0;
+                ++y;
+              }
+              $('html > head').append($('<style>' + css + '</style>'));
+              t = $('#t');
+              t.attr('style', 'display:block');
+              t.html(text);
+              $('#loading').hide();
+              $('#link').show();
+              return true;
+            };
+            img.onerror = function(e) {
+              console.log(e);
+              throw e;
+            };
+            return img.src = d.data;
+          },
+          error: function() {
             $('#link').hide();
             $('#loading').hide();
             $('#t').hide();
