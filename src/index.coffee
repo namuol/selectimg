@@ -5,6 +5,22 @@ html ->
     script src:'jquery.jsonp-2.3.1.min.js'
     style type:'text/css', 'body {font-family: monospace; text-align:center;}'
 
+    text """
+      <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-33247419-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+      </script>
+    """
+
   body ->
     div id:'back', style:'position:fixed;top:0;left:0;background:white', ->
       a style:'text-decoration:none', href:'http://namuol.github.com/', 'namuol.github.com ↗'
